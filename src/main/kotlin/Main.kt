@@ -22,7 +22,6 @@ import com.github.kwhat.jnativehook.mouse.*
 class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelListener {
 
     private var isListening by mutableStateOf(false)
-    private var isClicked by mutableStateOf(false)
     private var xCoordinate by mutableStateOf("")
     private var yCoordinate by mutableStateOf("")
     private var wheelAmount by mutableStateOf("")
@@ -34,8 +33,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .width(340.dp)
-                    .height(290.dp),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
@@ -86,7 +84,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                 Button(
                     onClick = {
                         if (!isListening) {
-                            wheelAmount = "0"
+                            wheelAmount = ""
                         }
                         isListening = !isListening
                         if (!isListening) {
@@ -100,7 +98,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                     Text(if (isListening) "Listening..." else "Click to listen")
                 }
                 Text(
-                    if(isListening) "Click anywhere to stop" else "",
+                    if (isListening) "Click anywhere to stop" else "",
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 );
@@ -128,16 +126,21 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
 
     override fun nativeMouseWheelMoved(e: NativeMouseWheelEvent) {
         if (isListening) {
-            if(e.wheelRotation > 0) {
+            if (wheelAmount == "") {
+                wheelAmount = "0"
+            }
+            if (e.wheelRotation > 0) {
                 wheelAmount = (wheelAmount.toInt() + e.scrollAmount).toString()
+                wheelRotation = "DOWN";
             } else {
                 wheelAmount = (wheelAmount.toInt() - e.scrollAmount).toString()
-            }
-            if (wheelAmount.toInt() > 0) {
-                wheelRotation = "DOWN";
-            } else if (wheelAmount.toInt() < 0) {
                 wheelRotation = "UP";
             }
+//            if (wheelAmount.toInt() > 0) {
+//                wheelRotation = "DOWN";
+//            } else if (wheelAmount.toInt() < 0) {
+//                wheelRotation = "UP";
+//            }
         }
     }
 }
@@ -155,7 +158,7 @@ fun main() = application {
     GlobalScreen.addNativeMouseWheelListener(demo)
 
     Window(
-        title = "MouseCoordinateHook",
+        title = "MouseListener",
         onCloseRequest = ::exitApplication,
         icon = painterResource("img/mouse_1.png"),
         state = WindowState(width = 340.dp, height = 290.dp),
