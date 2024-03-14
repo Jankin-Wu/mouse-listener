@@ -10,5 +10,5 @@ pluginManagement {
     }
     
 }
-rootProject.name = "mouse-coordinate-hook"
+rootProject.name = "mouse-listener"
 
