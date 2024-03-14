@@ -1,2 +1,2 @@
-# mouse-coordinate-hook
-一个简单的获取鼠标点击时坐标的应用
+# mouse-listener
+一个简单的鼠标监听器
