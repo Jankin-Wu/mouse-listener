@@ -106,7 +106,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                         )
                     }
                 }
-
+                Spacer(modifier = Modifier.height(30.dp))
                 Button(
                     onClick = {
                         if (!isListening) {
@@ -123,14 +123,18 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                             yCoordinate = ""
                         }
                     },
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
                     enabled = !isListening
                 ) {
-                    Text(if (isListening) "Listening..." else "Click to listen")
+                    Text(
+                        if (isListening) "Listening..." else "Click to listen",
+                        fontSize = 22.sp
+                    )
                 }
                 Text(
                     if (isListening) "Press any key on the keyboard to stop" else "",
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
@@ -208,7 +212,7 @@ fun main() = application {
         title = "MouseListener",
         onCloseRequest = ::exitApplication,
         icon = painterResource("img/mouse_1.png"),
-        state = WindowState(width = 600.dp, height = 290.dp),
+        state = WindowState(width = 600.dp, height = 338.dp),
         alwaysOnTop = true
     ) {
         app.App()

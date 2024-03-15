@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.jankinwu"
-version = "1.0"
+version = "1.0.0"
 
 repositories {
     maven("https://maven.aliyun.com/repository/public")
@@ -40,7 +40,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "Mouse Listener"
-            packageVersion = "1.1.0"
+            packageVersion = "1.0.0"
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
             windows {
                 shortcut = true
@@ -48,6 +48,15 @@ compose.desktop {
                 menu = true
                 upgradeUuid = "c3571647-90fb-4e2d-b89b-a8d4f67fd266"
                 iconFile.set(project.file("mouse_1.ico"))
+                packageName = "Mouse Listener"
+            }
+            linux {
+                packageName = "Mouse_Listener_amd64"
+                shortcut = true
+            }
+            macOS {
+                packageName = "Mouse_Listener_macos_x64"
+                dockName = "Mouse Listener"
             }
         }
     }
