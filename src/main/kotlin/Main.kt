@@ -26,7 +26,6 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
     private var isListening by mutableStateOf(false)
     private var xCoordinate by mutableStateOf("")
     private var yCoordinate by mutableStateOf("")
-    private var buttonName by mutableStateOf("")
     private var buttonCode by mutableStateOf(0)
     private var wheelAmount by mutableStateOf("")
     private var wheelRotation by mutableStateOf("")
@@ -112,6 +111,11 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                     onClick = {
                         if (!isListening) {
                             wheelAmount = ""
+                            xCoordinate = ""
+                            yCoordinate = ""
+                            buttonCode = 0
+                            wheelDirection = 0
+                            wheelRotation = ""
                         }
                         isListening = !isListening
                         if (!isListening) {
