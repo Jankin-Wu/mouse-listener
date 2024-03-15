@@ -17,15 +17,20 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.github.kwhat.jnativehook.GlobalScreen
 import com.github.kwhat.jnativehook.NativeHookException
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener
 import com.github.kwhat.jnativehook.mouse.*
 
-class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelListener {
+class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelListener, NativeKeyListener {
 
     private var isListening by mutableStateOf(false)
     private var xCoordinate by mutableStateOf("")
     private var yCoordinate by mutableStateOf("")
+    private var buttonName by mutableStateOf("")
+    private var buttonCode by mutableStateOf(0)
     private var wheelAmount by mutableStateOf("")
     private var wheelRotation by mutableStateOf("")
+    private var wheelDirection by mutableStateOf(0)
 
     @Composable
     fun App() {
@@ -57,13 +62,24 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                         readOnly = true,
                         label = { Text("Y") }
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    (if (buttonCode == 0) "" else ButtonEnum.getName(buttonCode))?.let {
+                        OutlinedTextField(
+                            value = it,
+                            onValueChange = {},
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            readOnly = true,
+                            label = { Text("Button Name") }
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     OutlinedTextField(
-                        value = "$wheelAmount",
+                        value = wheelAmount,
                         onValueChange = {},
                         modifier = Modifier.weight(1f),
                         singleLine = true,
@@ -79,6 +95,17 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                         readOnly = true,
                         label = { Text("Wheel Rotation") }
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    (if (wheelDirection == 0) "" else WheelEnum.getName(wheelDirection))?.let {
+                        OutlinedTextField(
+                            value = it,
+                            onValueChange = {},
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            readOnly = true,
+                            label = { Text("Wheel Direction") }
+                        )
+                    }
                 }
 
                 Button(
@@ -98,10 +125,10 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                     Text(if (isListening) "Listening..." else "Click to listen")
                 }
                 Text(
-                    if (isListening) "Click anywhere to stop" else "",
+                    if (isListening) "Press any key on the keyboard to stop" else "",
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
-                );
+                )
             }
         }
     }
@@ -110,11 +137,16 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
         if (isListening) {
             xCoordinate = "${e.x}"
             yCoordinate = "${e.y}"
-            isListening = false
+//            buttonCode = e.button
+//            isListening = false
         }
     }
 
-    override fun nativeMousePressed(e: NativeMouseEvent) = Unit
+    override fun nativeMousePressed(e: NativeMouseEvent) {
+        if (isListening) {
+            buttonCode = e.button
+        }
+    }
     override fun nativeMouseReleased(e: NativeMouseEvent) = Unit
 
     override fun nativeMouseMoved(e: NativeMouseEvent) {
@@ -124,6 +156,8 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
         }
     }
 
+    override fun nativeMouseDragged(e: NativeMouseEvent) = Unit
+
     override fun nativeMouseWheelMoved(e: NativeMouseWheelEvent) {
         if (isListening) {
             if (wheelAmount == "") {
@@ -131,11 +165,12 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
             }
             if (e.wheelRotation > 0) {
                 wheelAmount = (wheelAmount.toInt() + e.scrollAmount).toString()
-                wheelRotation = "DOWN";
+                wheelRotation = "DOWN"
             } else {
                 wheelAmount = (wheelAmount.toInt() - e.scrollAmount).toString()
-                wheelRotation = "UP";
+                wheelRotation = "UP"
             }
+            wheelDirection = e.wheelDirection
 //            if (wheelAmount.toInt() > 0) {
 //                wheelRotation = "DOWN";
 //            } else if (wheelAmount.toInt() < 0) {
@@ -143,7 +178,14 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
 //            }
         }
     }
+
+    override fun nativeKeyPressed(e: NativeKeyEvent?) {
+        if (isListening) {
+            isListening = false
+        }
+    }
 }
+
 
 fun main() = application {
     try {
@@ -152,18 +194,19 @@ fun main() = application {
         e.printStackTrace()
     }
 
-    val demo = Main()
-    GlobalScreen.addNativeMouseListener(demo)
-    GlobalScreen.addNativeMouseMotionListener(demo)
-    GlobalScreen.addNativeMouseWheelListener(demo)
+    val app = Main()
+    GlobalScreen.addNativeMouseListener(app)
+    GlobalScreen.addNativeMouseMotionListener(app)
+    GlobalScreen.addNativeMouseWheelListener(app)
+    GlobalScreen.addNativeKeyListener(app)
 
     Window(
         title = "MouseListener",
         onCloseRequest = ::exitApplication,
         icon = painterResource("img/mouse_1.png"),
-        state = WindowState(width = 340.dp, height = 290.dp),
+        state = WindowState(width = 600.dp, height = 290.dp),
         alwaysOnTop = true
     ) {
-        demo.App()
+        app.App()
     }
 }

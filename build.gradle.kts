@@ -39,12 +39,13 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = "MouseListener"
+            packageName = "Mouse Listener"
             packageVersion = "1.0.0"
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
             windows {
                 shortcut = true
                 dirChooser = true
+                menu = true
                 upgradeUuid = "c3571647-90fb-4e2d-b89b-a8d4f67fd266"
                 iconFile.set(project.file("mouse_1.ico"))
             }
