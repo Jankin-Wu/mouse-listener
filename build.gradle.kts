@@ -1,6 +1,8 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     kotlin("jvm") version "1.6.10"
@@ -24,6 +26,9 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
     implementation("com.github.kwhat:jnativehook:2.2.2")
+    @OptIn(ExperimentalComposeLibrary::class)
+    implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
 }
 
 tasks.test {

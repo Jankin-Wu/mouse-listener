@@ -1,18 +1,24 @@
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.github.kwhat.jnativehook.GlobalScreen
@@ -20,6 +26,8 @@ import com.github.kwhat.jnativehook.NativeHookException
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener
 import com.github.kwhat.jnativehook.mouse.*
+import java.awt.Dimension
+import java.awt.Toolkit
 
 class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelListener, NativeKeyListener {
 
@@ -32,7 +40,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
     private var wheelDirection by mutableStateOf(0)
 
     @Composable
-    fun App() {
+    fun App(windowWidth: Int) {
         MaterialTheme {
             Column(
                 modifier = Modifier
@@ -107,7 +115,12 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                     }
                 }
                 Spacer(modifier = Modifier.height(30.dp))
-                Button(
+                ElevatedButton(
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = Color(0xFFbca0f8)
+                    ),
+                    elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 10.dp, focusedElevation = 5.dp, hoveredElevation = 5.dp),
+                    shape = RoundedCornerShape(100),
                     onClick = {
                         if (!isListening) {
                             wheelAmount = ""
@@ -124,12 +137,17 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
                         }
                     },
                     modifier = Modifier
+                        .height(60.dp)
+//                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(100))
+                        .width(((windowWidth - 70)/3).dp)
+//                        .background(shape = RoundedCornerShape(100), color = Color(0xFFbca0f8))
                         .align(Alignment.CenterHorizontally),
                     enabled = !isListening
                 ) {
                     Text(
                         if (isListening) "Listening..." else "Click to listen",
-                        fontSize = 22.sp
+                        fontSize = 20.sp,
+                        color = Color.White
                     )
                 }
                 Text(
@@ -155,6 +173,7 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
             buttonCode = e.button
         }
     }
+
     override fun nativeMouseReleased(e: NativeMouseEvent) = Unit
 
     override fun nativeMouseMoved(e: NativeMouseEvent) {
@@ -187,15 +206,15 @@ class Main : NativeMouseListener, NativeMouseInputListener, NativeMouseWheelList
         }
     }
 
-    override fun nativeKeyPressed(e: NativeKeyEvent?) {
+    override fun nativeKeyPressed(e: NativeKeyEvent) {
         if (isListening) {
             isListening = false
         }
     }
 }
 
-
 fun main() = application {
+    var windowWidth by remember { mutableStateOf(0) }
     try {
         GlobalScreen.registerNativeHook()
     } catch (e: NativeHookException) {
@@ -212,9 +231,21 @@ fun main() = application {
         title = "MouseListener",
         onCloseRequest = ::exitApplication,
         icon = painterResource("img/mouse_1.png"),
-        state = WindowState(width = 600.dp, height = 338.dp),
+        state = WindowState(width = 600.dp, height = 338.dp, position =  WindowPosition((getScreenWidth()/3).dp, (getScreenHeight()/3).dp)),
+        resizable = false,
         alwaysOnTop = true
     ) {
-        app.App()
+        windowWidth = this.window.size.width
+        app.App(windowWidth)
     }
+}
+
+fun getScreenWidth(): Int {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    return screenSize.width
+}
+
+fun getScreenHeight(): Int {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    return screenSize.height
 }
